@@ -1,0 +1,40 @@
+<workflow-app name="NaiveBayes" xmlns="uri:oozie:workflow:0.1">
+    <action name="JavaNaiveBayes">
+        <spark xmlns="uri:oozie:spark-action:0.1">
+            <job-tracker>mapr1node:8021</job-tracker>
+            <name-node>mapr1node:8020</name-node>
+            <prepare>
+                <delete path="${ModelDirectory}"/>
+            </prepare>
+            <configuration>
+                <property>
+                    <name>mapred.compress.map.output</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <master>local[8]</master>
+            <mode>client<mode>
+            <name>JavaNaiveBayes</name>
+            <class>CS286.JavaNaiveBayes</class>
+            <jar>NaiveBayes.jar</jar>
+            <spark-opts>--executor-memory 20G --num-executors 50</spark-opts>
+            <arg>${type}</arg>
+            <arg>${SpamDirectory}</arg>
+		   <arg>${HamDirectory}</arg>
+		   <arg>${ModelDirectory}</arg>
+        </spark>
+        <ok to="MyNaiveBayes"/>
+    </action>
+<action name="MyNaiveBayes">
+<java>
+<prepare>
+   <delete path="${ModelDirectory}"/>
+</prepare>
+    <main-class>CS286.MyNaiveBayes</main-class>
+    <arg>${type}</arg>
+    <arg>${SpamDirectory}</arg>
+    <arg>${HamDirectory}</arg>
+    <arg>${ModelDirectory}</arg>
+</java>
+</action>
+</workflow-app>
